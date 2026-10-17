@@ -1,0 +1,34 @@
+name: Integración Continua (CI)
+
+on:
+  push:
+    branches: [ main, 'feature/**' ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    name: Ejecutar Pruebas Automatizadas
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x, 22.x]
+
+    steps:
+      - name: Descargar código del repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Instalar dependencias
+        run: npm install
+
+      - name: Ejecutar migraciones de base de datos
+        run: npm run migrate
+
+      - name: Ejecutar suite completa de pruebas (Unitarias y de API)
+        run: npm test
