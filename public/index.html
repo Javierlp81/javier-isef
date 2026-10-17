@@ -1,0 +1,327 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Control de Gastos y Deducibilidad Fiscal | ISEF</title>
+  <link rel="icon" type="image/png" href="/favicon.png">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="stylesheet" href="/css/styles.css?v=3">
+</head>
+<body>
+
+  <!-- Barra de Navegación Superior -->
+  <header class="barra-navegacion">
+    <div class="contenedor barra-contenido">
+      <div class="marca">
+        <img src="/img/logo.png" alt="Editorial ISEF" class="marca-logo" width="60" height="40" style="height: 40px; max-height: 40px; width: auto; object-fit: contain; flex-shrink: 0; display: block;">
+        <div>
+          <h1 class="marca-titulo">Control de Gastos</h1>
+          <span class="marca-subtitulo">Sistema de Comprobación y Deducibilidad Fiscal</span>
+        </div>
+      </div>
+      <div id="usuarioHeader" class="usuario-panel oculto">
+        <div class="usuario-etiqueta">
+          <span>Sesión iniciada como</span>
+          <span id="nombreUsuarioActual" class="usuario-nombre"></span>
+        </div>
+        <button type="button" id="btnCerrarSesion" class="btn btn-secundario btn-pequeno">Cerrar Sesión</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="contenedor">
+
+    <!-- Mensajes Globales de Alerta -->
+    <div id="alertaGlobal" class="alerta oculto" role="alert">
+      <span id="alertaGlobalTexto"></span>
+    </div>
+
+    <!-- Sección de inicio de sesión y registro -->
+    <section id="seccionAuth" class="autenticacion-seccion tarjeta">
+      <div class="auth-pestanas" role="tablist">
+        <button type="button" id="tabLogin" class="pestana-btn activo" role="tab" aria-selected="true" aria-controls="panelLogin">
+          Iniciar Sesión
+        </button>
+        <button type="button" id="tabRegistro" class="pestana-btn" role="tab" aria-selected="false" aria-controls="panelRegistro">
+          Crear Cuenta
+        </button>
+      </div>
+
+      <!-- Formulario de Inicio de Sesión -->
+      <div id="panelLogin" role="tabpanel" aria-labelledby="tabLogin">
+        <form id="formLogin" class="formulario" novalidate>
+          <div class="campo-grupo">
+            <label for="loginCorreo" class="campo-etiqueta">Correo electrónico <span class="requerido">*</span></label>
+            <input type="email" id="loginCorreo" class="campo-control" placeholder="correo@ejemplo.com" required autocomplete="email">
+            <span id="errorLoginCorreo" class="campo-error"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="loginPassword" class="campo-etiqueta">Contraseña <span class="requerido">*</span></label>
+            <input type="password" id="loginPassword" class="campo-control" placeholder="Ingresa tu contraseña" required autocomplete="current-password">
+            <span id="errorLoginPassword" class="campo-error"></span>
+          </div>
+
+          <button type="submit" id="btnSubmitLogin" class="btn btn-primario">
+            Entrar al Sistema
+          </button>
+        </form>
+      </div>
+
+      <!-- Formulario de Registro -->
+      <div id="panelRegistro" class="oculto" role="tabpanel" aria-labelledby="tabRegistro">
+        <form id="formRegistro" class="formulario" novalidate>
+          <div class="campo-grupo">
+            <label for="regNombre" class="campo-etiqueta">Nombre completo <span class="requerido">*</span></label>
+            <input type="text" id="regNombre" class="campo-control" placeholder="Ej. Ana Morales" required autocomplete="name">
+            <span id="errorRegNombre" class="campo-error"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="regCorreo" class="campo-etiqueta">Correo electrónico <span class="requerido">*</span></label>
+            <input type="email" id="regCorreo" class="campo-control" placeholder="correo@ejemplo.com" required autocomplete="email">
+            <span id="errorRegCorreo" class="campo-error"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="regPassword" class="campo-etiqueta">Contraseña <span class="requerido">*</span></label>
+            <input type="password" id="regPassword" class="campo-control" placeholder="Mínimo 8 caracteres" required minlength="8" autocomplete="new-password">
+            <span id="errorRegPassword" class="campo-error"></span>
+            <span class="campo-ayuda">Debe contener al menos 8 caracteres.</span>
+          </div>
+
+          <button type="submit" id="btnSubmitRegistro" class="btn btn-primario">
+            Crear mi Cuenta
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- Panel principal de gastos -->
+    <section id="seccionApp" class="oculto">
+
+      <!-- Barra Superior de Filtros y Acciones -->
+      <div class="barra-herramientas">
+        <div class="filtros-grupo">
+          <div class="campo-grupo">
+            <label for="filtroMes" class="campo-etiqueta">Mes a consultar</label>
+            <input type="month" id="filtroMes" class="campo-control">
+          </div>
+
+          <div class="campo-grupo">
+            <label for="filtroCategoria" class="campo-etiqueta">Filtrar por categoría</label>
+            <select id="filtroCategoria" class="campo-control">
+              <option value="">Todas las categorías</option>
+              <option value="Papelería">Papelería</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Alimentos">Alimentos</option>
+              <option value="Servicios">Servicios</option>
+              <option value="Otros">Otros</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="acciones-grupo">
+          <button type="button" id="btnExportarCsv" class="btn btn-secundario">
+            Exportar CSV
+          </button>
+          <button type="button" id="btnAbrirModalNuevoGasto" class="btn btn-primario">
+            Nuevo Gasto
+          </button>
+        </div>
+      </div>
+
+
+      <!-- Tarjetas de Resumen Mensual -->
+      <div class="resumen-cuadricula">
+        <div class="tarjeta tarjeta-metrica">
+          <h2 class="metrica-titulo">Total Gastado</h2>
+          <div id="resumenTotalGastado" class="metrica-valor">$0.00</div>
+          <div id="resumenCantidadGastos" class="metrica-detalle">0 gastos registrados</div>
+        </div>
+
+        <div class="tarjeta tarjeta-metrica tarjeta-deducible">
+          <h2 class="metrica-titulo">Total Deducible</h2>
+          <div id="resumenTotalDeducible" class="metrica-valor">$0.00</div>
+          <div id="resumenPorcentajeDeducible" class="metrica-detalle">0% del total comprobado</div>
+        </div>
+
+        <div class="tarjeta tarjeta-metrica">
+          <h2 class="metrica-titulo">Total No Deducible</h2>
+          <div id="resumenTotalNoDeducible" class="metrica-valor">$0.00</div>
+          <div class="metrica-detalle">Sin factura o efectivo superior a $2,000</div>
+        </div>
+      </div>
+
+      <!-- Desglose por Categoría -->
+      <div class="tarjeta desglose-panel">
+        <h2 class="desglose-titulo">Desglose por Categoría en el Mes</h2>
+        <div id="desgloseCategoriasContainer" class="desglose-lista">
+          <!-- Renderizado dinámico -->
+        </div>
+      </div>
+
+      <!-- Gráficos Interactivos Ligeros -->
+      <div id="seccionGraficos" class="tarjeta graficos-panel oculto">
+        <h2 class="desglose-titulo">Análisis Gráfico del Mes</h2>
+        <div class="graficos-cuadricula">
+          <!-- Gráfico 1: Proporción Deducible vs No Deducible -->
+          <div class="grafico-card">
+            <h3 class="grafico-subtitulo">Proporción de Deducibilidad Fiscal</h3>
+            <div id="graficoDeducibilidadContainer" class="grafico-donut-caja"></div>
+            <div class="grafico-leyenda">
+              <span class="leyenda-item"><span class="leyenda-color leyenda-deducible"></span> Deducible</span>
+              <span class="leyenda-item"><span class="leyenda-color leyenda-no-deducible"></span> No deducible</span>
+            </div>
+          </div>
+
+          <!-- Gráfico 2: Distribución por Categoría -->
+          <div class="grafico-card">
+            <h3 class="grafico-subtitulo">Gasto por Categoría</h3>
+            <div id="graficoCategoriasContainer" class="grafico-barras-lista"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Estados del listado: cargando, sin gastos o error -->
+
+      <!-- Estado: Cargando -->
+      <div id="estadoCargando" class="estado-caja oculto" role="status">
+        <div class="indicador-carga"></div>
+        <p class="estado-titulo">Cargando información...</p>
+        <p class="estado-descripcion">Consultando los registros y cálculos fiscales del mes seleccionado.</p>
+      </div>
+
+      <!-- Estado: Lista Vacía -->
+      <div id="estadoVacio" class="estado-caja oculto">
+        <p class="estado-titulo">No hay gastos registrados</p>
+        <p class="estado-descripcion">No se encontraron gastos para el mes o filtro seleccionado. Puedes dar de alta uno nuevo con el botón de abajo.</p>
+        <button type="button" id="btnNuevoGastoVacio" class="btn btn-primario">Registrar Primer Gasto</button>
+      </div>
+
+      <!-- Estado: Error al cargar -->
+      <div id="estadoError" class="estado-caja oculto" role="alert">
+        <p class="estado-titulo">No se pudo cargar la información</p>
+        <p id="mensajeErrorCarga" class="estado-descripcion">Ocurrió un problema de comunicación con el servidor.</p>
+        <button type="button" id="btnReintentarCarga" class="btn btn-secundario">Reintentar</button>
+      </div>
+
+      <!-- Contenedor de la Tabla de Gastos -->
+      <div id="contenedorTabla" class="tabla-contenedor oculto">
+        <table class="tabla-gastos">
+          <thead>
+            <tr>
+              <th scope="col">Fecha</th>
+              <th scope="col">Concepto</th>
+              <th scope="col">Categoría</th>
+              <th scope="col">Monto</th>
+              <th scope="col">Forma de Pago</th>
+              <th scope="col">Factura</th>
+              <th scope="col">Deducibilidad</th>
+              <th scope="col" class="col-acciones">Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="cuerpoTablaGastos">
+            <!-- Filas inyectadas de forma segura con textContent -->
+          </tbody>
+        </table>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- MODAL: REGISTRAR / EDITAR GASTO -->
+  <div id="modalGasto" class="modal-fondo oculto" role="dialog" aria-modal="true" aria-labelledby="modalGastoTitulo">
+    <div class="modal-contenido">
+      <div class="modal-cabecera">
+        <h2 id="modalGastoTitulo" class="modal-titulo">Registrar Gasto</h2>
+        <button type="button" id="btnCerrarModalGasto" class="modal-cerrar" aria-label="Cerrar ventana">&times;</button>
+      </div>
+      <div class="modal-cuerpo">
+        <form id="formGasto" class="formulario" novalidate>
+          <input type="hidden" id="gastoId">
+
+          <div class="campo-grupo">
+            <label for="gastoFecha" class="campo-etiqueta">Fecha del gasto <span class="requerido">*</span></label>
+            <input type="date" id="gastoFecha" class="campo-control" required>
+            <span id="errorGastoFecha" class="campo-error"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="gastoConcepto" class="campo-etiqueta">Concepto o descripción <span class="requerido">*</span></label>
+            <input type="text" id="gastoConcepto" class="campo-control" placeholder="Ej. Compra de papelería para oficina" required minlength="3" maxlength="120">
+            <span id="errorGastoConcepto" class="campo-error"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="gastoCategoria" class="campo-etiqueta">Categoría <span class="requerido">*</span></label>
+            <select id="gastoCategoria" class="campo-control" required>
+              <option value="">Selecciona una categoría</option>
+              <option value="Papelería">Papelería</option>
+              <option value="Transporte">Transporte</option>
+              <option value="Alimentos">Alimentos</option>
+              <option value="Servicios">Servicios</option>
+              <option value="Otros">Otros</option>
+            </select>
+            <span id="errorGastoCategoria" class="campo-error"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="gastoMonto" class="campo-etiqueta">Monto ($ MXN) <span class="requerido">*</span></label>
+            <input type="number" id="gastoMonto" class="campo-control" placeholder="0.00" step="0.01" min="0.01" required>
+            <span id="errorGastoMonto" class="campo-error"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="gastoFormaPago" class="campo-etiqueta">Forma de pago <span class="requerido">*</span></label>
+            <select id="gastoFormaPago" class="campo-control" required>
+              <option value="">Selecciona la forma de pago</option>
+              <option value="Efectivo">Efectivo</option>
+              <option value="Transferencia">Transferencia</option>
+              <option value="Tarjeta">Tarjeta</option>
+            </select>
+            <span id="errorGastoFormaPago" class="campo-error"></span>
+          </div>
+
+          <div class="campo-grupo">
+            <label for="gastoTieneFactura" class="campo-etiqueta">¿Cuenta con factura fiscal? <span class="requerido">*</span></label>
+            <select id="gastoTieneFactura" class="campo-control" required>
+              <option value="1">Sí, cuenta con factura fiscal (CFDI)</option>
+              <option value="0">No cuenta con factura fiscal</option>
+            </select>
+            <span id="errorGastoTieneFactura" class="campo-error"></span>
+          </div>
+
+          <div class="modal-acciones">
+            <button type="button" id="btnCancelarModalGasto" class="btn btn-secundario">Cancelar</button>
+            <button type="submit" id="btnGuardarGasto" class="btn btn-primario">Guardar Gasto</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal para confirmar eliminación de gasto -->
+  <div id="modalConfirmarEliminar" class="modal-fondo oculto" role="dialog" aria-modal="true" aria-labelledby="modalEliminarTitulo">
+    <div class="modal-contenido">
+      <div class="modal-cabecera">
+        <h2 id="modalEliminarTitulo" class="modal-titulo">Confirmar Eliminación de Gasto</h2>
+        <button type="button" id="btnCerrarModalEliminar" class="modal-cerrar" aria-label="Cerrar ventana">&times;</button>
+      </div>
+      <div class="modal-cuerpo">
+        <p style="margin-bottom: 0.75rem;">¿Estás seguro de que deseas eliminar este gasto?</p>
+        <p id="detalleGastoEliminar" style="font-weight: 500; color: var(--color-texto-principal); background: var(--color-fondo); padding: 0.625rem; border-radius: var(--radio-sm); border: 1px solid var(--color-borde);"></p>
+        <p style="font-size: 0.8125rem; color: var(--color-texto-suave); margin-top: 0.5rem;">Esta acción eliminará el registro de la base de datos de manera definitiva.</p>
+        <div class="modal-acciones">
+          <button type="button" id="btnCancelarEliminar" class="btn btn-secundario">Cancelar</button>
+          <button type="button" id="btnConfirmarEliminar" class="btn btn-peligro">Eliminar Definitivamente</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module" src="/js/app.js"></script>
+</body>
+</html>
