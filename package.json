@@ -1,0 +1,35 @@
+{
+  "name": "isef-control-gastos",
+  "version": "1.0.0",
+  "description": "Sistema de Control de Gastos y Deducibilidad Fiscal - Practica Tecnica Full Stack Junior ISEF",
+  "main": "src/server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "migrate": "node src/db/migrate.js",
+    "test": "node --test"
+  },
+  "keywords": [
+    "gastos",
+    "deducibilidad",
+    "isef",
+    "express",
+    "sqlite"
+  ],
+  "author": "Javier Leyva",
+  "license": "ISC",
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.8.1",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1"
+  },
+  "devDependencies": {
+    "supertest": "^7.0.0"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  }
+}
